@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Example</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</head>
+
+{% macro render(issues) %}
+<body>
+       <tbody>
+                {% for issue in issues %}
+                <tr data-issue-id="tr{{issue.issue_id}}">
+                    <td>{{ issue.issue_id }}</td>
+                    <td>{{ issue.user_id }}</td>
+                    <td>{{ issue.username }}</td>
+                    <td>{{ issue.summary }}</td>
+                    <td>{{ issue.description }}</td>
+                    <td>{{ issue.create_at }}</td>
+                    <td>{{ issue.status }}</td>
+                    <td>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"  onClick="viewComment('{{issue.issue_id }}')" data-bs-target="#showComment{{ issue.issue_id }}">
+                            View comments
+                     </button>
+                    <div class="modal" id="showComment{{ issue.issue_id }}" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+                                <div class="modal-dialog " style="height: 60vh;max-width: 90vw;width:90vw">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="showCommentLabel">Add issue</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="modalForm1{{issue.issue_id}}">
+                                                            <table class="table table-striped" id="commentsTable{{issue.issue_id}}">
+                                                            <thead>
+                                                            <tr>
+                                                            <th>comment_id</th>
+                                                            <th>issue_id</th>
+                                                            <th>user_id</th>
+                                                            <th>username</th>
+                                                            <th>role</th>
+                                                            <th>profile_image</th>
+                                                            <th>content</th>
+                                                            <th>create_at</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            </tbody>
+                                                            </table>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                    </div>
+
+
+
+                    </td>
+                       <td>
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCommentModal{{ issue.issue_id }}">
+                            Add Comment
+                         </button>
+                        <div class="modal" id="addCommentModal{{ issue.issue_id }}" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="addCommentModalLabel">Add Comment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                        <form id="modalForm3">
+                        <div class="mb-3">
+                        <label for="content{{ issue.issue_id }}" class="form-label">Content</label>
+                        <input type="text" class="form-control" id="content{{ issue.issue_id }}" placeholder="Enter your content" required>
+                        </div>
+                        </form>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="okAddComment{{ issue.issue_id }}" onclick="addCommentOk('{{ issue.issue_id }}')">Ok</button>
+                        </div>
+                        <div class="mb-3" id="addCommentPrompt{{ issue.issue_id }}" style="color: red;"></div></div>
+                        </div>
+                        </div>
+                        </td>
+                      <td>
+
+                          {% if session['role'] == "visitor" %}
+                         No permission
+                        {% else %}
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"  onClick="changeStatus('{{issue.issue_id }}')" data-bs-target="#changeStatusModal{{ issue.issue_id }}">
+                        change status
+                        </button>
+                        {% endif %}
+
+
+
+                             <div class="modal" id="changeStatusModal{{ issue.issue_id }}" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" style="width: 20%; max-width: 20%;height:40%;">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="showCommentLabel{{ issue.issue_id }}">Change status</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="modalForm6{{issue.issue_id}}">
+                                                <label for="statusSelect{{ issue.issue_id }}">
+                                                    <select class="form-select" id="statusSelect{{ issue.issue_id }}" name="status">
+                                                    <!-- Dynamically populate the options with status values -->
+                                                    <option value="open {% if issue.status == 'new' %}selected{% endif %}">new</option>
+                                                    <option value="closed{% if issue.status == 'open' %}selected{% endif %}">open</option>
+                                                    <option value="stalled {% if issue.status == 'stalled' %}selected{% endif %}">stalled</option>
+                                                    <option value="resolved {% if issue.status == 'resolved' %}selected{% endif %}">resolved</option>
+                                                    </select>
+
+                                                </label>
+
+                                            </form>
+
+                                        </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" id="change{{ issue.issue_id }}" onclick="changeStatusOk('{{ issue.issue_id }}')">Ok</button>
+                                            </div>
+                                    </div>
+                                </div>
+                    </div>
+
+
+
+
+
+
+                        </td>
+                </tr>
+                {% endfor %}
+                <div class="modal" id="showMessage" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Message</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" id="showMessageText">
+                                Issue added successfully!
+                                </div>
+                                </div>
+                            </div>
+                 </div>
+<!--                  </tbody>-->
+
+       <script>
+
+
+
+        function modalHide(id){
+            const modalElement = document.getElementById(id);
+            const addCommentModal = new bootstrap.Modal(modalElement);
+            addCommentModal.show();
+            addCommentModal.hide();
+        }
+
+        document.getElementById('addIssueOk').addEventListener('click', function() {    // 添加 change 事件监听器
+                var summary = document.getElementById('summary').value.trim()
+                var description = document.getElementById('description').value.trim()
+                // 获取 messagePrompt 元素
+                var messageDiv = document.getElementById('messagePrompt');
+                // 设置 messageDiv 的内容
+                messageDiv.textContent = "";
+
+
+                if (summary === "") {
+                    messageDiv.textContent="Summary cannot be empty"
+                    return
+                }
+
+                if (description === "") {
+                    messageDiv.textContent="Description cannot be empty"
+                    return
+                }
+
+               let data={
+                summary: summary,
+                description: description
+                }
+               jsonRequest("add_issue",data).then(result=>{
+                   if(result.data.success){
+                       setPrompt(result.data.message)
+                       searchIssue()
+                   }
+               })
+         });
+
+        function viewComment(issueId){
+                const commentsTableBody = document.querySelector('#commentsTable'+issueId+' tbody');
+                // 清空之前的表格内容
+                commentsTableBody.innerHTML = '';
+                jsonRequest("get_comment",{ issue_id: issueId })
+                .then(result => {
+                result.data.message.forEach(comment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td>${comment.comment_id}</td>
+                <td>${comment.issue_id}</td>
+                <td>${comment.user_id}</td>
+                <td>${comment.username}</td>
+                <td>${comment.role}</td>
+                <td>
+                <img src="static/images/${comment.profile_image}"   style="height: 50px; width: 50px;" alt="" />
+                </td>
+                <td>${comment.content}</td>
+                <td>${comment.create_at}</td>
+                `;
+                commentsTableBody.appendChild(row);
+                });
+                })
+       }
+
+
+
+
+       function changeStatusOk(issue_id){
+                var selectElement = document.getElementById('statusSelect'+issue_id);    // 获取select元素
+                var selectedOption = selectElement.options[selectElement.selectedIndex];     // 获取选中的option元素
+                var selectedText = selectedOption.text;  // 获取选中的option的文本值
+                jsonRequest("/change_status",{status:selectedText,issue_id:issue_id}) .then(result => {
+                if (result.data.success) {
+                      setPrompt('Successfully changed state')
+                      searchIssue();
+                }
+                });
+        }
+
+            function addCommentOk(issueId) {
+                const content = document.getElementById('content' + issueId).value;
+                if (!content) {   // 检查任一字段是否为空
+                   document.getElementById('addCommentPrompt' + issueId).textContent = "Information cannot be empty";
+                   return;
+                }
+               jsonRequest("/add_comment",{content: content, issue_id: issueId}).then(success=>{
+                    setPrompt("Comment added successfully")
+                    searchIssue();
+               });
+       }
+
+
+
+</script>
+
+
+</body>
+{% endmacro %}
+
+</html>

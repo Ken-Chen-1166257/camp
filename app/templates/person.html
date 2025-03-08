@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+    .alert {
+    height: 40px; /* 设置固定高度 */
+    }
+
+    input[type="file"] {
+        display: none; /* 隐藏文件输入框 */
+    }
+
+    .modal-backdrop {
+    width: 100%;
+    }
+
+    .gB {
+        background-color: #4CAF50; /* 自定义绿色 */
+
+    }
+
+         .btn-gst{
+            background-color: #007bff; /* 自定义按钮背景色 */
+            border: none; /* 去掉边框 */
+            border-radius: 0.5rem; /* 自定义圆角 */
+            padding: 0.75rem 1.5rem; /* 自定义内边距 */
+            font-size: 1.25rem; /* 自定义字体大小 */
+        }
+
+    </style>
+</head>
+<body>
+    {% include 'prompt.html' %}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <div class="container">
+        <div class="container   d-flex mt-2">
+            <button type="button" class="btn btn-danger" id="logoutId">
+            Logout
+            </button>
+        </div>
+
+      <div class="row vh-90  align-items-center justify-content-center">
+        <div class="col-8">
+            <div class="bg-info text-white border border-bottom-0 rounded-top text-center">
+                <h1 class="p-3 m-0">Edit information</h1>
+            </div>
+            <div class="bg-white border container">
+                   <form action="{{ url_for('edit_person') }}" method="POST" enctype="multipart/form-data">
+                    <!-- Username Input -->
+                    <!-- Email Input -->
+                    <div class="mb-3 row align-items-center mt-2">
+                    <label for="email" class="form-label  col-5 me-8">Email: </label>
+                    <div class="col-7">
+                    <input type="email" class="form-control col-7 " id="email" name="email" placeholder="Enter your email" maxlength="100" value="{{ user.email }}" required>
+                    </div>
+                    </div>
+
+
+
+
+
+                    <!-- First Name Input -->
+                      <div class="mb-3 row align-items-center">
+                        <label for="firstName" class="form-label col-5">First Name: </label>
+                            <div class="col-7">
+                        <input type="text" class="form-control col-7" id="firstName" name="firstName" placeholder="Enter your first name" maxlength="100" value="{{ user.first_name }}" required>
+                      </div>
+                    </div>
+
+
+                    <!-- Last Name Input -->
+                    <div class="mb-3 row align-items-center">
+                    <label for="firstName" class="form-label col-5">Last Name: </label>
+                    <div class="col-7">
+                    <input type="text" class="form-control col-7" id="lastName" name="lastName" placeholder="Enter your last name" maxlength="100" value="{{ user.last_name }}" required>
+                    </div>
+                    </div>
+<!--                       Location-->
+                    <div class="mb-3 row align-items-center">
+                    <label for="location" class="form-label col-5">Location: </label>
+                    <div class="col-7">
+                    <input type="text" class="form-control" id="location" name="location" placeholder="Enter your location" maxlength="100" value="{{ user.location }}" required>
+                    </div>
+                    </div>
+
+
+                    <!-- Profile Image Input -->
+                <div>
+                           <label for="profileImage" class="form-label col-2">Profile Image: </label>
+                       <img id="profileImagePreview" src="{{ url_for('static', filename='images/' + user.profile_image) }}" alt="Current Profile Image" style="height: 100px; width: 100px; ">
+                </div>
+
+                      <div class="mb-3 row align-items-center">
+
+                              <div class="col-1">
+                              <input type="file" class="form-control" id="profileImage" name="profileImage" accept="image/*" onchange="previewImage()">
+                              </div>
+                         <div id="showPath">
+                         </div>
+                    </div>
+
+
+
+                  <div class="mb-3 row align-items-center">
+                        <div class="col-2">
+                        <button type="button" class="btn btn-primary" onclick="clearImageClick()">Clear image</button>
+                        </div>
+                        <div class="col-2">
+                        <button type="button" class="btn btn-success me-2" onclick="showAlert()">Change image</button>
+                        </div>
+                       </div>
+
+                        <div class="mb-3 row align-items-center">
+                        <div class="col-2">
+                        <button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editPassword">Edit password</button>
+                        </div>
+                        </div>
+
+                                   {% if edit_invalid %}
+                           <div class="alert alert-primary ">
+                                   {{ edit_invalid }} <!-- 显示不为空的错误信息 -->
+                                        </div>
+                                   {% endif %}
+
+                    <div class="text-center mb-2">
+
+                        <button type="submit" class="btn btn-primary btn-lg mt-6">Edit </button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+
+
+
+
+<!-- 模态框 -->
+<div class="modal" id="editPassword" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inputModalLabel">Edit password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="modalForm">
+
+                    <div class="mb-3 row align-items-center">
+                        <label for="change" class="form-label col-5" style="margin-bottom: 0;">Change Password</label>
+                        <div class="col-7">
+                            <input type="password" class="form-control" id="change" placeholder="Please enter to change password" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row align-items-center">
+                        <label for="confirm" class="form-label col-5" style="margin-bottom: 0;">Confirm Password</label>
+                        <div class="col-7">
+                            <input type="password" class="form-control" id="confirm" placeholder="Please enter the confirmation password" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer"></div>
+                <button type="button" class="btn btn-primary" id="passwordEditOk">Ok</button>
+            </div>
+            <div class="mb-3" id="passwordPrompt" style="color: red;"></div></div>
+        </div>
+</div>
+
+
+
+
+
+
+<!--显示信息-->
+   <div class="modal" id="showMessage" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Message</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body" id="showMessageText">
+                    Issue added successfully!
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+<script>
+
+
+
+    document.getElementById('logoutId').addEventListener('click', function() {
+       askOk("Do you want to cancel?").then((confirmed) => {
+        if (confirmed) {
+               window.location.href = `logout`;
+        }
+        });
+    });
+
+
+
+    // 获取模态框元素和按钮
+    const modalElement = document.getElementById('editPassword');
+    const editPasswordModal = new bootstrap.Modal(modalElement);
+
+    function showAlert() {
+       document.getElementById('profileImage').click(); // 触发文件输入框的点击
+   }
+
+
+   function clearImageClick(){
+        // 使用示例
+        askOk("Do you want to clear the image file?").then((confirmed) => {
+        if (confirmed) {
+            jsonRequest("/clear_image", {}).then(result => {
+                if (result.data.success) {
+                    const imgElement = document.getElementById('profileImagePreview');
+                    imgElement.src = "";  // 清除显示
+                    document.getElementById('showPath').textContent="";//图片路径不显示
+                    displayPrompt(result.data.message);
+                }
+            });
+        }
+        });
+
+   }
+
+
+    function  removeFade(){
+           // 找到所有具有 class "modal-backdrop" 的元素并移除
+        const offcanvas = document.querySelectorAll('.offcanvas-backdrop');
+        offcanvas.forEach(function(backdrop) {
+        backdrop.remove();
+        });
+        const backdrops1 = document.querySelectorAll('.modal-backdrop');
+        backdrops1.forEach(function(backdrop) {
+        backdrop.remove();
+        });
+    }
+
+      document.getElementById('passwordEditOk').addEventListener('click', function() {    // 添加 change 事件监听器
+            const show= document.getElementById('passwordPrompt')
+            const password = document.getElementById('change').value;
+            const confirmPassword = document.getElementById('confirm').value;
+            var hasLetter = /[a-zA-Z]/.test(password);
+            var hasNumber = /[0-9]/.test(password);
+            if (password.length < 8) {
+            show.textContent="Password must be at least 8 characters long.";
+            return;
+            }
+            if (!hasLetter || !hasNumber) {
+            show.textContent= "Password must contain both letters and numbers.";
+            return;
+            }
+            if (password !== confirmPassword) {
+             show.textContent="The passwords do not match.";
+             return;
+            }
+
+            jsonRequest("edit_password",{confirm:confirmPassword}).then(result=>{
+                if(result.data.success){
+                    editPasswordModal.hide()
+                    removeFade()
+                    displayPrompt(result.data.message)
+                }else{
+                    show.textContent=result.data.message;
+                }
+            })
+         })
+
+
+        function previewImage() {
+        const fileInput = document.getElementById('profileImage');
+        const file = fileInput.files[0]; // 获取文件
+            //todo 下面注释不要删除  用做不跳转页面渲染图像
+        // if (file) {
+        //     const reader = new FileReader();   // 创建 FileReader 对象
+        //     reader.onload = function (event) {         // 当文件加载完成后，更新 img 标签的 src 属性
+        //         const imgElement = document.getElementById('profileImagePreview');
+        //         imgElement.src = event.target.result;  // 设置新的图片源
+        //         document.getElementById('showPath').textContent=file.name;
+        //         // displayPrompt("Image editing successful")
+        //     };
+        //     reader.readAsDataURL(file);
+        // }
+            const formData = new FormData();
+            formData.append('file', file); // 将文件添加到 FormData 对象
+
+            formRequest("edit_image",formData).then(result=>{
+                if(result.data.success){
+                      setPrompt("Image editing successful")
+                    window.location.href="person"
+                }
+            })
+
+    }
+  </script>
+
+
+</body>
+</html>

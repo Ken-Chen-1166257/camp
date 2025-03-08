@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+</head>
+    <style>
+        /* 自定义样式 */
+        .nav-container {
+            height: 5%; /* 设置第一个 div 高度为 10% 的视口高度 */
+            width: 100%;
+        }
+        .content-container {
+            height: 95%; /* 设置第二个 div 高度为 90% 的视口高度 */
+              width: 100%;
+        }
+          /* 设置被选中的导航链接的背景颜色为紫色 */
+        .nav-link.active {
+            background-color: purple !important; /* 背景颜色为紫色 */
+            color: white;             /* 文字颜色为白色 */
+        }
+
+    </style>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    {% include 'prompt.html' %}
+
+    <div class="bg-info flex-grow-1 text-black border rounded-top nav-container d-flex align-items-center" style="width: 100%; min-height: 50px;">
+        <ul class="nav nav-pills justify-content-center w-100">
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if active_page == 'v1' else '' }}" href="/home">Issue management</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if active_page == 'v2' else '' }}" href="/person">Personal management</a>
+            </li>
+              {% if session['role'] != 'visitor' %}
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if active_page == 'v3' else '' }}" href="/user_management">User management</a>
+            </li>
+               {% endif %}
+        </ul>
+    </div>
+<!--style="overflow-x: auto;"-->
+
+    <div class="bg-light flex-grow-1 text-center content-container" style="overflow-x: auto;">
+        <div class="content" style="white-space: nowrap;">
+        {% if active_page == 'v1' %}
+        {% include 'issue.html' %}
+        {% elif active_page == 'v2' %}
+        {% include 'person.html' %}
+        {% elif active_page == 'v3'  and session['role'] != 'visitor' %}
+        {% include 'user.html' %}
+        {% endif %}
+        </div>
+    </div>
+
+  <script>
+
+</script>
+
+
+</body>
+</html>
